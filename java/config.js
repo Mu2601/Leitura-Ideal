@@ -1,1 +1,1 @@
-const planilhalivros = "https://script.google.com/macros/s/AKfycbyhAgYiZIAH4AfM2CciLoG_2kdBq49jjaoMOfCBw-XVjiJ9GS9fD2h39jEL3X8GSTay/exec";
+const planilhalivros = "https://script.google.com/macros/s/AKfycbzTxUGzH0O9PZYMRwnfply50B_kYAMJUwL9HfY1mFseYYwVMuN9zNOAwkcjPeJheC29/exec";
