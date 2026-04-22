@@ -1,5 +1,5 @@
 // 1. Definição das variáveis de URL (sem await aqui!)
-const urlOriginal = 'https://script.google.com/macros/s/AKfycbxZRpkeeNeZPAnAODyNwuiJ0wxOO1BE-bV9X2RWXaykDq9v7zzRPnYZRzlDftx-VhLW/exec'; 
+const urlOriginal = 'https://script.google.com/macros/s/AKfycbxM3cRdtob2UCx3_UnUpVs_hjQ7Cr_pOn7hPNQ3T8u045ceWR_nllxVjwPi1mr_f-yL/exec'; 
 const planilhalivros = 'https://corsproxy.io/?url=' + encodeURIComponent(urlOriginal);
 
 // 2. O carregamento inicial da página
