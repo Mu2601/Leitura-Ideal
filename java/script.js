@@ -1,24 +1,31 @@
-// Substitua pela sua URL atual do Google Apps Script
-const urlGoogle = 'https://script.google.com/macros/s/AKfycbxzsW1BIV_VjjOWl_6QVlSyw9MHXTp-TfELJXE2eGi3AV6mDWsKjiReRjA4fB6EH98/exec';
-const planilhalivros = 'https://corsproxy.io/?url=' + encodeURIComponent(urlGoogle);
+// 1. Substitua pela URL que o Render ou PythonAnywhere te fornecer após o deploy
+// Enquanto testa no seu PC, use: 'http://127.0.0.1:5000'
+const URL_API = 'http://127.0.0.1:5000'; 
 
-// FUNÇÃO PARA CARREGAR E EXIBIR OS LIVROS
+// FUNÇÃO PARA CARREGAR E EXIBIR OS LIVROS VINDO DO EXCEL
 async function Livros() {
     const lista = document.getElementById('book-list');
     if (!lista) return;
 
     try {
-        lista.innerHTML = '<p style="color: white;">Carregando biblioteca...</p>';
-        const resposta = await fetch(planilhalivros);
+        lista.innerHTML = '<p style="color: white;">Carregando biblioteca do Excel...</p>';
+        
+        // Agora buscamos da rota /listar do seu servidor Python
+        const resposta = await fetch(`${URL_API}/listar`);
         const biblioteca = await resposta.json();
 
         lista.innerHTML = ''; 
+
+        if (biblioteca.length === 0) {
+            lista.innerHTML = '<p style="color: white;">Nenhum livro cadastrado no Excel ainda.</p>';
+            return;
+        }
 
         biblioteca.forEach(livro => {
             const item = document.createElement('li');
             item.className = 'book-item';
             
-            // Mapeamento exato baseado na sua planilha
+            // Os nomes aqui devem ser IGUAIS aos cabeçalhos da sua coluna no Excel
             let titulo = livro.titulo || "Sem título";
             let autor = livro.autor || "Autor desconhecido";
             let capa = livro.capa || "https://via.placeholder.com/100x150?text=Sem+Capa";
@@ -38,12 +45,12 @@ async function Livros() {
             lista.appendChild(item);
         });
     } catch (e) {
-        console.error("Erro ao carregar:", e);
-        lista.innerHTML = '<p style="color: #ff4d4d;">Erro ao carregar livros.</p>';
+        console.error("Erro ao carregar do servidor Python:", e);
+        lista.innerHTML = '<p style="color: #ff4d4d;">Erro ao conectar com o servidor Python. Ele está ligado?</p>';
     }
 }
 
-// FUNÇÃO PARA CADASTRAR NOVO LIVRO (CORRIGIDA)
+// FUNÇÃO PARA CADASTRAR NOVO LIVRO NO EXCEL
 async function cadastrarLivro() {
     const t = document.getElementById('titulo').value;
     const a = document.getElementById('autor').value;
@@ -52,7 +59,6 @@ async function cadastrarLivro() {
     const d = document.getElementById('descricao').value;
     const h = document.getElementById('quantidade').value;
 
-    // Validação corrigida: agora usando as letras certas
     if (!t || !a || !g) {
         alert("Preencha o título, autor e gênero!");
         return;
@@ -65,27 +71,31 @@ async function cadastrarLivro() {
         capa: c,
         generol: g,
         descricao: d,
-        quantidade: h,
-        status: 'disponível',
-        prazo: ''
+        quantidade: h
     };
 
     try {
-        await fetch(urlGoogle, { // Envia direto para o Google (POST não usa proxy)
+        // Agora enviamos para a rota /cadastrar do seu Python
+        const response = await fetch(`${URL_API}/cadastrar`, {
             method: 'POST',
-            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(novoLivro)
         });
 
-        alert("Livro salvo com sucesso!");
-        location.reload();
+        if (response.ok) {
+            alert("Livro cadastrado no Excel com sucesso!");
+            location.reload();
+        } else {
+            throw new Error("Erro no servidor");
+        }
     } catch (erro) {
         console.error("Erro ao cadastrar:", erro);
-        alert("Erro ao conectar com a planilha.");
+        alert("Erro ao conectar com o servidor Python.");
     }
 }
 
-// Inicialização correta para evitar SyntaxError
 document.addEventListener('DOMContentLoaded', () => {
     Livros();
 });
