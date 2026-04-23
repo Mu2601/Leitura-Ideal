@@ -2,11 +2,11 @@
 
 async function cadastrarLivro() {
     // 1. Pegando os valores
-    const t = document.getElementById('titulo').value;
-    const a = document.getElementById('autor').value;
-    const c = document.getElementById('capa').value;
+    const b = document.getElementById('titulo').value;
+    const c = document.getElementById('autor').value;
+    const d = document.getElementById('capa').value;
     const g = document.getElementById('generol').value;
-    const d = document.getElementById('descricao').value;
+    const e = document.getElementById('descricao').value;
     const h = document.getElementById('quantidade').value; // 'h' é a quantidade
 
     // 2. Validação: Adicionei o 'g' (gênero) aqui para obrigar o preenchimento
@@ -18,11 +18,11 @@ async function cadastrarLivro() {
     // 3. Montando o objeto CORRIGIDO (Adicionado generol e quantidade)
     const novoLivro = {
         id: Date.now().toString(),
-        titulo: t,
-        autor: a,
-        capa: c,
+        titulo: b,
+        autor: c,
+        capa: d,
         generol: g,       // <--- Faltava isso
-        descricao: d,
+        descricao: e,
         quantidade: h,    // <--- Faltava isso (certifique-se que o nome aqui seja igual ao do doPost)
         status: 'disponível',
         prazo: ''
