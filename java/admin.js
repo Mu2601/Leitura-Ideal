@@ -1,31 +1,25 @@
-const urlGoogle = 'https://script.google.com/macros/s/AKfycbxzsW1BIV_VjjOWl_6QVlSyw9MHXTp-TfELJXE2eGi3AV6mDWsKjiReRjA4fB6EH98/exec';
-
 async function cadastrarLivro() {
-    const t = document.getElementById('titulo').value;
-    const a = document.getElementById('autor').value;
-    const c = document.getElementById('capa').value;
-    const d = document.getElementById('descricao').value;
-
-    if (!t || !a) return alert("Título e Autor são obrigatórios!");
-
-    const novoLivro = {
-        titulo: t,
-        autor: a,
-        capa: c,
-        descricao: d,
-        status: 'disponível'
+    const dados = {
+        id: Date.now().toString(),
+        titulo: document.getElementById('titulo').value,
+        autor: document.getElementById('autor').value,
+        capa: document.getElementById('capa').value,
+        descricao: document.getElementById('descricao').value,
+        generol: document.getElementById('generol').value,
+        quantidade: document.getElementById('quantidade').value
     };
 
     try {
-        // No POST (cadastro), NÃO use o corsproxy.io
-        await fetch(urlGoogle, {
+        const resposta = await fetch('http://127.0.0.1:5000/cadastrar', {
             method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(novoLivro)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
         });
-        alert("Livro salvo!");
-        location.reload();
+        
+        const resultado = await resposta.json();
+        alert(resultado.mensagem);
     } catch (erro) {
-        console.error("Erro ao salvar:", erro);
+        console.error("Erro ao conectar com o Python:", erro);
+        alert("O servidor Python está ligado?");
     }
 }
