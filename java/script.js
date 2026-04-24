@@ -1,23 +1,28 @@
-// 1. Substitua pela URL que o Render ou PythonAnywhere te fornecer após o deploy
-// Enquanto testa no seu PC, use: 'http://127.0.0.1:5000'
-const URL_API = 'http://127.0.0.1:5000'; 
+// =========================================================
+// CONFIGURAÇÃO: Substitua pelo seu link do PythonAnywhere
+// Exemplo: https://murilo.pythonanywhere.com
+// =========================================================
+const URL_API = 'https://Muri26.pythonanywhere.com'; 
 
-// FUNÇÃO PARA CARREGAR E EXIBIR OS LIVROS VINDO DO EXCEL
-async function Livros() {
+// 1. FUNÇÃO PARA CARREGAR OS LIVROS DO EXCEL (VIA PYTHON)
+async function carregarLivros() {
     const lista = document.getElementById('book-list');
     if (!lista) return;
 
     try {
-        lista.innerHTML = '<p style="color: white;">Carregando biblioteca do Excel...</p>';
+        lista.innerHTML = '<p style="color: white;">Buscando livros no acervo...</p>';
         
-        // Agora buscamos da rota /listar do seu servidor Python
+        // Faz a requisição para a rota /listar do Python
         const resposta = await fetch(`${URL_API}/listar`);
+        
+        if (!resposta.ok) throw new Error("Erro ao conectar com o servidor");
+        
         const biblioteca = await resposta.json();
 
         lista.innerHTML = ''; 
 
         if (biblioteca.length === 0) {
-            lista.innerHTML = '<p style="color: white;">Nenhum livro cadastrado no Excel ainda.</p>';
+            lista.innerHTML = '<p style="color: white;">Nenhum livro encontrado no Excel.</p>';
             return;
         }
 
@@ -25,7 +30,7 @@ async function Livros() {
             const item = document.createElement('li');
             item.className = 'book-item';
             
-            // Os nomes aqui devem ser IGUAIS aos cabeçalhos da sua coluna no Excel
+            // Mapeia os campos exatamente como estão nas colunas do Excel
             let titulo = livro.titulo || "Sem título";
             let autor = livro.autor || "Autor desconhecido";
             let capa = livro.capa || "https://via.placeholder.com/100x150?text=Sem+Capa";
@@ -33,34 +38,36 @@ async function Livros() {
 
             item.innerHTML = `
                 <div class="card-livro" style="display: flex; gap: 20px; padding: 15px; border-bottom: 1px solid #333; background: #111; margin-bottom: 10px; border-radius: 8px;">
-                    <img src="${capa}" style="width: 100px; height: 140px; object-fit: cover; border-radius: 4px;">
+                    <img src="${capa}" style="width: 100px; height: 140px; object-fit: cover; border-radius: 4px;" alt="Capa do livro">
                     <div class="info" style="flex: 1;">
                         <strong style="color: #00ff9d; font-size: 1.2em; display: block;">${titulo}</strong>
                         <em style="color: #aaa; display: block; margin-bottom: 5px;">${autor}</em>
                         <p style="color: white; font-size: 0.9em; line-height: 1.4;">${desc}</p>
-                        <button style="margin-top: 10px; background: #00ff9d; color: black; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Pegar</button>
+                        <button onclick="alert('Funcionalidade de empréstimo em breve!')" style="margin-top: 10px; background: #00ff9d; color: black; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Pegar</button>
                     </div>
                 </div>
             `;
             lista.appendChild(item);
         });
     } catch (e) {
-        console.error("Erro ao carregar do servidor Python:", e);
-        lista.innerHTML = '<p style="color: #ff4d4d;">Erro ao conectar com o servidor Python. Ele está ligado?</p>';
+        console.error("Erro na API:", e);
+        lista.innerHTML = '<p style="color: #ff4d4d;">Erro ao carregar livros. Verifique se o servidor está online.</p>';
     }
 }
 
-// FUNÇÃO PARA CADASTRAR NOVO LIVRO NO EXCEL
+// 2. FUNÇÃO PARA CADASTRAR NOVO LIVRO NO EXCEL (VIA PYTHON)
 async function cadastrarLivro() {
+    // Pega os valores dos campos do seu formulário HTML
     const t = document.getElementById('titulo').value;
     const a = document.getElementById('autor').value;
     const c = document.getElementById('capa').value;
     const g = document.getElementById('generol').value;
     const d = document.getElementById('descricao').value;
-    const h = document.getElementById('quantidade').value;
+    const q = document.getElementById('quantidade').value;
 
-    if (!t || !a || !g) {
-        alert("Preencha o título, autor e gênero!");
+    // Validação básica
+    if (!t || !a) {
+        alert("Pelo menos Título e Autor são obrigatórios!");
         return;
     }
 
@@ -71,11 +78,10 @@ async function cadastrarLivro() {
         capa: c,
         generol: g,
         descricao: d,
-        quantidade: h
+        quantidade: q
     };
 
     try {
-        // Agora enviamos para a rota /cadastrar do seu Python
         const response = await fetch(`${URL_API}/cadastrar`, {
             method: 'POST',
             headers: {
@@ -85,17 +91,20 @@ async function cadastrarLivro() {
         });
 
         if (response.ok) {
-            alert("Livro cadastrado no Excel com sucesso!");
-            location.reload();
+            alert("Livro cadastrado com sucesso no Excel!");
+            // Limpa o formulário ou recarrega a página
+            location.reload(); 
         } else {
-            throw new Error("Erro no servidor");
+            const erroData = await response.json();
+            alert("Erro ao salvar: " + erroData.mensagem);
         }
     } catch (erro) {
-        console.error("Erro ao cadastrar:", erro);
-        alert("Erro ao conectar com o servidor Python.");
+        console.error("Erro no cadastro:", erro);
+        alert("Erro ao conectar com o servidor PythonAnywhere.");
     }
 }
 
+// 3. INICIALIZAÇÃO: Roda quando a página termina de carregar
 document.addEventListener('DOMContentLoaded', () => {
-    Livros();
+    carregarLivros();
 });
