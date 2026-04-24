@@ -1,11 +1,11 @@
-// URL do seu servidor no PythonAnywhere (Mude se o seu link for diferente)
+// URL do seu servidor oficial no PythonAnywhere
 const API_URL = "https://Muri26.pythonanywhere.com";
 
-// 1. FUNÇÃO PARA CADASTRAR LIVRO
+// 1. FUNÇÃO PARA CADASTRAR UM NOVO LIVRO
 function cadastrarLivro() {
-    // Pega os valores dos campos do formulário (Garanta que os IDs no HTML sejam esses)
+    // Pega os valores digitados nos campos do seu HTML
     const livro = {
-        id: Date.now(), // Gera um ID único baseado no tempo
+        id: Date.now(), // Cria um ID único usando a hora atual
         titulo: document.getElementById('titulo').value,
         autor: document.getElementById('autor').value,
         capa: document.getElementById('capa').value,
@@ -14,13 +14,13 @@ function cadastrarLivro() {
         quantidade: document.getElementById('quantidade').value
     };
 
-    // Verifica se os campos principais estão preenchidos
+    // Validação simples: não deixa enviar sem título ou autor
     if (!livro.titulo || !livro.autor) {
-        alert("Por favor, preencha o título e o autor.");
+        alert("Por favor, preencha pelo menos o título e o autor.");
         return;
     }
 
-    // Faz a chamada para o seu servidor Python
+    // Envia os dados para o PythonAnywhere via POST
     fetch(`${API_URL}/cadastrar`, {
         method: 'POST',
         headers: {
@@ -33,49 +33,55 @@ function cadastrarLivro() {
         return response.json();
     })
     .then(data => {
-        alert("Livro salvo com sucesso no Excel!");
-        console.log(data);
-        // Limpa o formulário após salvar
+        alert("📚 Livro salvo com sucesso no Excel!");
+        console.log("Resposta do servidor:", data);
+        
+        // Limpa os campos do formulário para o próximo cadastro
         document.getElementById('form-livro').reset();
+        
+        // Atualiza a lista de livros na tela automaticamente
+        listarLivros();
     })
     .catch(error => {
         console.error("Erro no cadastro:", error);
-        alert("Erro ao conectar com o servidor. Verifique se o PythonAnywhere está ligado.");
+        alert("Erro ao conectar com o servidor. Verifique se deu 'Reload' no PythonAnywhere.");
     });
 }
 
-// 2. FUNÇÃO PARA LISTAR LIVROS (Chamar ao carregar a página ou clicar em "Ver Livros")
+// 2. FUNÇÃO PARA BUSCAR E EXIBIR OS LIVROS DO EXCEL
 function listarLivros() {
     fetch(`${API_URL}/listar`)
     .then(response => response.json())
     .then(livros => {
-        const container = document.getElementById('lista-livros'); // Onde os livros vão aparecer
+        const container = document.getElementById('lista-livros');
         if (!container) return;
 
-        container.innerHTML = ""; // Limpa a lista antes de mostrar
+        container.innerHTML = ""; // Limpa a lista atual para não duplicar
 
         if (livros.length === 0) {
-            container.innerHTML = "<p>Nenhum livro encontrado no Excel.</p>";
+            container.innerHTML = "<p>Nenhum livro cadastrado ainda.</p>";
             return;
         }
 
+        // Cria o visual de cada livro que vem do Excel
         livros.forEach(livro => {
             const card = `
-                <div class="livro-card">
-                    <img src="${livro.capa}" alt="Capa" style="width:100px">
-                    <h3>${livro.titulo}</h3>
-                    <p>Autor: ${livro.autor}</p>
-                    <p>Gênero: ${livro.generol}</p>
-                    <p>Qtd: ${livro.quantidade}</p>
+                <div class="livro-card" style="border: 1px solid #ccc; padding: 10px; margin: 10px; border-radius: 8px;">
+                    <img src="${livro.capa}" alt="Capa" style="width:100px; display:block; margin-bottom:10px;">
+                    <strong style="font-size: 1.2em;">${livro.titulo}</strong>
+                    <p><strong>Autor:</strong> ${livro.autor}</p>
+                    <p><strong>Gênero:</strong> ${livro.generol}</p>
+                    <p><strong>Quantidade:</strong> ${livro.quantidade}</p>
+                    <p><em>${livro.descricao}</em></p>
                 </div>
             `;
             container.innerHTML += card;
         });
     })
     .catch(error => {
-        console.error("Erro ao listar:", error);
+        console.error("Erro ao listar livros:", error);
     });
 }
 
-// Chamar a listagem automaticamente quando a página abrir
+// Executa a listagem assim que a página termina de carregar
 window.onload = listarLivros;
