@@ -10,7 +10,7 @@ function cadastrarLivro() {
         autor: document.getElementById('autor').value,
         capa: document.getElementById('capa').value,
         descricao: document.getElementById('descricao').value,
-        generol: document.getElementById('genero').value,
+        generol: document.getElementById('generol').value,
         quantidade: document.getElementById('quantidade').value
     };
 
