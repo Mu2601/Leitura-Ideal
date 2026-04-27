@@ -78,7 +78,7 @@ section, footer {
 
 .card-livro:hover {
     transform: translateY(-10px);
-    border-color: #00ff9d;
+    border-color: #0091ff;
 }
 
 /* 6. CAPA E DETALHES DENTRO DO CARD */
@@ -103,7 +103,7 @@ section, footer {
 
 .card-detalhes h3 {
     font-size: 1.2rem; /* h3 menor para caber no card */
-    color: #00ff9d;
+    color: #0091ff;
 }
 
 .genero-tag {
@@ -112,12 +112,12 @@ section, footer {
     border-radius: 20px;
     font-size: 0.7rem;
     align-self: flex-start;
-    color: #00ff9d;
+    color: #0091ff;
 }
 
 /* 7. BOTÕES E STATUS */
 .btn-pegar { 
-    background: #00ff9d; 
+    background: #0091ff; 
     color: black; 
     border: none; 
     padding: 10px; 
