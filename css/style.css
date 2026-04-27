@@ -65,5 +65,11 @@
 
 .quantidade {
     font-weight: bold;
+
+.ic {
+     max-width: 40px;
+    height: auto;
+    vertical-align: middle;
+}
     font-size: 0.85rem;
 }
