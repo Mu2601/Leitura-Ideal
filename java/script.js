@@ -5,14 +5,18 @@ const API_URL = "https://Muri26.pythonanywhere.com";
 function filtrarLivros(lista) {
     const vistos = new Set();
     return lista.filter(livro => {
-        const temInfoBasica = livro.titulo && livro.capa && livro.autor;
-        const eDuplicado = vistos.has(livro.titulo.toLowerCase());
+        // Se a linha estiver vazia ou sem título, ignora sem travar o site
+        if (!livro.titulo || !livro.autor) return false;
+
+        // Converte para texto com segurança para evitar erro de 'null'
+        const tituloTexto = String(livro.titulo).toLowerCase();
         
-        vistos.add(livro.titulo.toLowerCase());
-        return temInfoBasica && !eDuplicado;
+        const eDuplicado = vistos.has(tituloTexto);
+        vistos.add(tituloTexto);
+
+        return !eDuplicado;
     });
 }
-
 // --- 2. EXIBIÇÃO DINÂMICA DE CARDS (Item 2) ---
 function listarLivros() {
     fetch(`${API_URL}/listar`)
