@@ -1,52 +1,135 @@
 const API_URL = "https://Muri26.pythonanywhere.com";
 
-// ITEM 3: Função para filtrar livros ruins ou duplicados
+// --- 1. LIMPEZA E FILTRAGEM (Item 3) ---
+// Remove duplicados e livros com informações faltando antes de exibir
 function filtrarLivros(lista) {
     const vistos = new Set();
     return lista.filter(livro => {
-        // Remove se faltar info importante
-        const temInfo = livro.titulo && livro.capa && livro.autor && livro.generol;
-        // Remove se for duplicado (mesmo título)
-        const duplicado = vistos.has(livro.titulo.toLowerCase());
+        const temInfoBasica = livro.titulo && livro.capa && livro.autor;
+        const eDuplicado = vistos.has(livro.titulo.toLowerCase());
+        
         vistos.add(livro.titulo.toLowerCase());
-
-        return temInfo && !duplicado;
+        return temInfoBasica && !eDuplicado;
     });
 }
 
+// --- 2. EXIBIÇÃO DINÂMICA DE CARDS (Item 2) ---
 function listarLivros() {
     fetch(`${API_URL}/listar`)
     .then(response => response.json())
     .then(dadosBrutos => {
-        const livros = filtrarLivros(dadosBrutos); // Aplica a limpeza (Item 3)
+        const livros = filtrarLivros(dadosBrutos);
         const container = document.getElementById('lista-livros');
         if (!container) return;
 
         container.innerHTML = "";
+        
+        // Recupera a sessão do usuário logado
         const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
 
         livros.forEach(livro => {
-            // ITEM 2: Lógica visual de disponibilidade
-            const estaEmprestado = livro.usuario_id; // Verificaremos isso no Excel depois
-            const botaoAcao = estaEmprestado 
-                ? `<span class="indisponivel">Indisponível</span>` 
-                : `<button class="btn-pegar" onclick="pegarLivro(${livro.id})">Pegar</button>`;
+            let acaoHtml = "";
 
-            const card = `
+            // Lógica de botões baseada no status do livro e do usuário
+            if (sessao) {
+                const donoId = String(livro.usuario_id); // ID de quem pegou (do Excel)
+                const meuId = String(sessao.id);        // Meu ID (do JSONBin)
+
+                if (!livro.usuario_id || donoId === "None" || donoId === "null") {
+                    // Livro disponível
+                    acaoHtml = `<button class="btn-pegar" onclick="pegarLivro(${livro.id})">Pegar</button>`;
+                } else if (donoId === meuId) {
+                    // O livro está comigo
+                    acaoHtml = `<button class="btn-pegar" style="background:orange" onclick="devolverLivro(${livro.id})">Devolver</button>`;
+                } else {
+                    // O livro está com outro usuário
+                    acaoHtml = `<span class="indisponivel">Indisponível</span>`;
+                }
+            } else {
+                acaoHtml = `<p style="font-size:11px; color:#888;">Faça login para reservar</p>`;
+            }
+
+            container.innerHTML += `
                 <div class="card-livro">
                     <div class="capa-container">
-                        <img src="${livro.capa}" onerror="this.src='https://via.placeholder.com/150x220?text=Sem+Capa'">
+                        <img src="${livro.capa}" alt="Capa" onerror="this.src='https://via.placeholder.com/150x220?text=Sem+Capa'">
                     </div>
                     <div class="card-detalhes">
                         <h3>${livro.titulo}</h3>
-                        <span class="genero-tag">${livro.generol}</span>
+                        <p class="autor"><strong>Autor:</strong> ${livro.autor}</p>
+                        <div class="tags">
+                            <span class="genero-tag">${livro.generol}</span>
+                            <span class="qtd-tag">Qtd: ${livro.quantidade}</span>
+                        </div>
                         <p class="descricao">${livro.descricao}</p>
-                        ${sessao ? botaoAcao : '<p>Faça login para pegar</p>'}
+                        <div class="card-footer">
+                            ${acaoHtml}
+                        </div>
                     </div>
                 </div>
             `;
-            container.innerHTML += card;
         });
+    })
+    .catch(error => console.error("Erro ao listar livros:", error));
+}
+
+// --- 3. AÇÕES DE EMPRÉSTIMO (Item 2) ---
+function pegarLivro(idLivro) {
+    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
+    
+    fetch(`${API_URL}/emprestar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            livro_id: idLivro,
+            usuario_id: sessao.id
+        })
+    })
+    .then(res => res.json())
+    .then(() => {
+        alert("📚 Livro reservado!");
+        listarLivros(); // Atualiza a lista na tela
+    })
+    .catch(err => alert("Erro ao processar empréstimo."));
+}
+
+function devolverLivro(idLivro) {
+    fetch(`${API_URL}/devolver`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ livro_id: idLivro })
+    })
+    .then(res => res.json())
+    .then(() => {
+        alert("✅ Livro devolvido com sucesso!");
+        listarLivros();
+    })
+    .catch(err => alert("Erro ao devolver livro."));
+}
+
+// --- 4. CONTROLE DA BIBLIOTECÁRIA E SESSÃO (Item 1 e 4) ---
+function cadastrarLivro() {
+    const livro = {
+        id: Date.now(),
+        titulo: document.getElementById('titulo').value,
+        autor: document.getElementById('autor').value,
+        capa: document.getElementById('capa').value,
+        descricao: document.getElementById('descricao').value,
+        generol: document.getElementById('generol').value,
+        quantidade: document.getElementById('quantidade').value
+    };
+
+    if (!livro.titulo || !livro.autor) return alert("Título e Autor são obrigatórios.");
+
+    fetch(`${API_URL}/cadastrar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(livro)
+    })
+    .then(() => {
+        alert("Livro cadastrado!");
+        document.getElementById('form-livro').reset();
+        listarLivros();
     });
 }
 
@@ -57,9 +140,16 @@ function atualizarDashboard() {
 
     if (sessao) {
         const usuario = JSON.parse(sessao);
-        infoLogin.innerHTML = `Olá, <strong>${usuario.nome}</strong>! <button onclick="fazerLogout()">Sair</button>`;
         
-        // ITEM 4: Login da bibliotecária libera o painel
+        // Exibe saudação e botão sair
+        if (infoLogin) {
+            infoLogin.innerHTML = `
+                <span>Olá, <strong>${usuario.nome}</strong></span>
+                <button onclick="fazerLogout()" class="btn-pegar" style="padding:2px 8px; font-size:12px; margin-left:10px;">Sair</button>
+            `;
+        }
+
+        // Libera painel de cadastro se for admin
         if (usuario.tipo === 'admin' && painelAdmin) {
             painelAdmin.style.display = 'block';
         }
@@ -71,7 +161,7 @@ function fazerLogout() {
     window.location.reload();
 }
 
-// CORREÇÃO: Apenas um window.onload que gerencia tudo
+// --- 5. INICIALIZAÇÃO ---
 window.onload = () => {
     atualizarDashboard();
     listarLivros();
