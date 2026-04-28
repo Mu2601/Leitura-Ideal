@@ -79,3 +79,28 @@ function listarLivros() {
 }
 
 window.onload = listarLivros;
+
+
+function atualizarDashboard() {
+    const sessao = localStorage.getItem('usuarioLogado');
+    const painelAdmin = document.getElementById('painel-admin');
+    const infoLogin = document.getElementById('info-login');
+
+    if (sessao) {
+        const usuario = JSON.parse(sessao);
+        
+        // 1. Mostra saudação no dashboard
+        infoLogin.innerHTML = `Olá, <strong>${usuario.nome}</strong>! <button onclick="fazerLogout()">Sair</button>`;
+
+        // 2. Se for admin, libera o painel de controle de livros
+        if (usuario.tipo === 'admin') {
+            painelAdmin.style.display = 'block';
+        }
+    }
+}
+
+// Chame essa função sempre que a página carregar
+window.onload = () => {
+    atualizarDashboard();
+    listarLivros(); // A função que busca os livros no PythonAnywhere
+};
