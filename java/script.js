@@ -1,177 +1,27 @@
 const API_URL = "https://Muri26.pythonanywhere.com";
-let todosOsLivros = []; // Memória local para a busca funcionar
+let todosOsLivros = []; 
 
-// --- 1. FILTRAGEM DE SEGURANÇA ---
-function filtrarLivros(lista) {
-    const vistos = new Set();
-    return lista.filter(livro => {
-        if (!livro || !livro.titulo) return false;
-        const tituloTexto = String(livro.titulo).toLowerCase();
-        const eDuplicado = vistos.has(tituloTexto);
-        vistos.add(tituloTexto);
-        return !eDuplicado;
-    });
-}
+// --- 1. LOGIN E SESSÃO ---
+function realizarLogin(usuario, senha) {
+    let dadosUsuario = null;
+    if (usuario === "admin" && senha === "123") {
+        dadosUsuario = { nome: "Bibliotecária", tipo: "admin", id: "999" };
+    } else if (usuario === "leitor" && senha === "123") {
+        dadosUsuario = { nome: "Miroki", tipo: "leitor", id: "101" };
+    }
 
-// --- 2. LISTAGEM E BUSCA ---
-function listarLivros() {
-    fetch(`${API_URL}/listar`)
-    .then(res => res.json())
-    .then(dadosBrutos => {
-        todosOsLivros = filtrarLivros(dadosBrutos);
-        renderizarCards(todosOsLivros);
-    })
-    .catch(error => console.error("Erro ao listar:", error));
-}
-
-function pesquisarLivros() {
-    const input = document.getElementById('search-input');
-    if (!input) return;
-    const termo = input.value.toLowerCase();
-
-    const filtrados = todosOsLivros.filter(livro => {
-        return livro.titulo.toLowerCase().includes(termo) ||
-               livro.autor.toLowerCase().includes(termo) ||
-               String(livro.generol).toLowerCase().includes(termo);
-    });
-    renderizarCards(filtrados);
-}
-
-// --- 3. RENDERIZAÇÃO DOS CARDS (Lógica de Múltiplas Unidades) ---
-function renderizarCards(lista) {
-    const container = document.getElementById('lista-livros');
-    if (!container) return;
-    container.innerHTML = "";
-
-    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
-
-    lista.forEach(livro => {
-        let acaoHtml = "";
-        
-        // Transformamos a string de IDs do Excel em uma lista real de IDs
-        // Ex: "10,25" vira ["10", "25"]
-        const listaIdsBorrowers = String(livro.usuario_id || "")
-            .split(',')
-            .map(id => id.trim())
-            .filter(id => id !== "" && id !== "None" && id !== "null");
-
-        const qtdTotal = parseInt(livro.quantidade) || 0;
-        const qtdEmprestada = listaIdsBorrowers.length;
-        const qtdDisponivel = qtdTotal - qtdEmprestada;
-
-        if (sessao) {
-            const meuId = String(sessao.id);
-            const euEstouComEle = listaIdsBorrowers.includes(meuId);
-
-            // LOGICA DOS BOTÕES
-            if (euEstouComEle) {
-                // Se o ID do usuário logado está na lista, ele vê "Devolver"
-                acaoHtml = `<button class="btn-pegar" style="background:orange" onclick="devolverLivro(${livro.id})">Devolver</button>`;
-            } else if (qtdDisponivel > 0) {
-                // Se tem estoque e ele não pegou, ele vê "Pegar"
-                acaoHtml = `<button class="btn-pegar" onclick="pegarLivro(${livro.id})">Pegar (${qtdDisponivel} un.)</button>`;
-            } else {
-                // Se o estoque acabou
-                acaoHtml = `<span class="indisponivel">Esgotado</span>`;
-            }
-
-            // OPÇÃO 1: Botão de Excluir (Só para Admin)
-            if (sessao.tipo === 'admin') {
-                acaoHtml += `<button onclick="excluirLivro(${livro.id})" style="background:red; margin-left:8px; padding: 5px 10px;" class="btn-pegar">🗑️</button>`;
-            }
-        } else {
-            acaoHtml = `<p style="font-size:11px; color:#888;">Faça login para reservar</p>`;
-        }
-
-        container.innerHTML += `
-            <div class="card-livro">
-                <div class="capa-container">
-                    <img src="${livro.capa}" alt="Capa" onerror="this.src='https://via.placeholder.com/150x220?text=Sem+Capa'">
-                </div>
-                <div class="card-detalhes">
-                    <h3>${livro.titulo}</h3>
-                    <p class="autor"><strong>Autor:</strong> ${livro.autor}</p>
-                    <div class="tags">
-                        <span class="genero-tag">${livro.generol}</span>
-                        <span class="qtd-tag">Total: ${qtdTotal}</span>
-                    </div>
-                    <p class="descricao">${livro.descricao}</p>
-                    <div class="card-footer">${acaoHtml}</div>
-                </div>
-            </div>
-        `;
-    });
-}
-
-// --- 4. AÇÕES (Pegar, Devolver, Excluir) ---
-function pegarLivro(idLivro) {
-    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
-    fetch(`${API_URL}/emprestar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ livro_id: idLivro, usuario_id: sessao.id })
-    })
-    .then(res => res.json())
-    .then(dados => {
-        if (dados.success) {
-            alert("📚 Livro reservado!");
-            listarLivros();
-        } else {
-            alert(dados.message || "Erro ao pegar livro.");
-        }
-    });
-}
-
-function devolverLivro(idLivro) {
-    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
-    fetch(`${API_URL}/devolver`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ livro_id: idLivro, usuario_id: sessao.id })
-    })
-    .then(() => {
-        alert("✅ Livro devolvido!");
-        listarLivros();
-    });
-}
-
-function excluirLivro(idLivro) {
-    if (confirm("Tem certeza que deseja excluir este livro do acervo?")) {
-        fetch(`${API_URL}/excluir`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ livro_id: idLivro })
-        })
-        .then(() => {
-            alert("🗑️ Livro removido!");
-            listarLivros();
-        });
+    if (dadosUsuario) {
+        localStorage.setItem('usuarioLogado', JSON.stringify(dadosUsuario));
+        alert(`Bem-vindo(a), ${dadosUsuario.nome}!`);
+        window.location.href = "index.html"; 
+    } else {
+        alert("Usuário ou senha incorretos.");
     }
 }
 
-// --- 5. CADASTRO E DASHBOARD ---
-function cadastrarLivro() {
-    const livro = {
-        id: Date.now(),
-        titulo: document.getElementById('titulo').value,
-        autor: document.getElementById('autor').value,
-        capa: document.getElementById('capa').value,
-        descricao: document.getElementById('descricao').value,
-        generol: document.getElementById('generol').value,
-        quantidade: document.getElementById('quantidade').value
-    };
-
-    if (!livro.titulo || !livro.autor) return alert("Preencha título e autor.");
-
-    fetch(`${API_URL}/cadastrar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(livro)
-    }).then(() => {
-        alert("Livro cadastrado!");
-        document.getElementById('form-livro').reset();
-        listarLivros();
-    });
+function fazerLogout() {
+    localStorage.removeItem('usuarioLogado');
+    window.location.href = "login.html";
 }
 
 function atualizarDashboard() {
@@ -184,7 +34,7 @@ function atualizarDashboard() {
         if (infoLogin) {
             infoLogin.innerHTML = `
                 <span>Olá, <strong>${usuario.nome}</strong></span>
-                <button onclick="fazerLogout()" class="btn-pegar" style="padding:2px 8px; font-size:12px; margin-left:10px;">Sair</button>
+                <button onclick="fazerLogout()" style="padding:2px 8px; margin-left:10px; background:#ff4757; color:white; border:none; border-radius:4px; cursor:pointer;">Sair</button>
             `;
         }
         if (usuario.tipo === 'admin' && painelAdmin) {
@@ -193,19 +43,132 @@ function atualizarDashboard() {
     }
 }
 
-function fazerLogout() {
-    localStorage.removeItem('usuarioLogado');
-    window.location.reload();
+// --- 2. GESTÃO DE LIVROS (CADASTRO) ---
+function cadastrarLivro() {
+    // Verificando se os campos existem antes de pegar o valor (evita erro de 'null')
+    const campoTitulo = document.getElementById('titulo');
+    const campoAutor = document.getElementById('autor');
+    const campoCapa = document.getElementById('capa');
+    const campoDesc = document.getElementById('descricao');
+    const campoGen = document.getElementById('generol');
+    const campoQtd = document.getElementById('quantidade');
+
+    if (!campoTitulo || !campoAutor) return;
+
+    const livro = {
+        id: Date.now(),
+        titulo: campoTitulo.value,
+        autor: campoAutor.value,
+        capa: campoCapa.value,
+        descricao: campoDesc.value,
+        generol: campoGen.value,
+        quantidade: campoQtd.value
+    };
+
+    if (!livro.titulo || !livro.autor) {
+        alert("Título e Autor são obrigatórios!");
+        return;
+    }
+
+    fetch(`${API_URL}/cadastrar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(livro)
+    })
+    .then(res => res.json())
+    .then(dados => {
+        alert("📚 Livro cadastrado com sucesso!");
+        const form = document.getElementById('form-livro');
+        if(form) form.reset(); 
+    })
+    .catch(err => {
+        console.error("Erro na API:", err);
+        alert("Erro ao conectar com o servidor. Verifique se o PythonAnywhere está ativo.");
+    });
 }
 
-// --- 6. INICIALIZAÇÃO ---
+// --- 3. LISTAGEM E BUSCA ---
+function listarLivros() {
+    const container = document.getElementById('lista-livros');
+    if (!container) return; // Só executa se estiver na página de listagem
+
+    fetch(`${API_URL}/listar`)
+    .then(res => res.json())
+    .then(dadosBrutos => {
+        todosOsLivros = dadosBrutos.filter(l => l && l.titulo); 
+        renderizarCards(todosOsLivros);
+    })
+    .catch(err => console.error("Erro ao listar:", err));
+}
+
+function renderizarCards(lista) {
+    const container = document.getElementById('lista-livros');
+    if (!container) return;
+    container.innerHTML = "";
+
+    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+    lista.forEach(livro => {
+        let acaoHtml = "";
+        const listaIds = String(livro.usuario_id || "").split(',').filter(id => id && id !== "None" && id !== "null");
+        const disponivel = (parseInt(livro.quantidade) || 0) - listaIds.length;
+
+        if (sessao) {
+            const meuId = String(sessao.id);
+            if (listaIds.includes(meuId)) {
+                acaoHtml = `<button onclick="devolverLivro(${livro.id})" style="background:orange">Devolver</button>`;
+            } else if (disponivel > 0) {
+                acaoHtml = `<button onclick="pegarLivro(${livro.id})">Pegar (${disponivel} un.)</button>`;
+            } else {
+                acaoHtml = `<span style="color:red">Esgotado</span>`;
+            }
+
+            if (sessao.tipo === 'admin') {
+                acaoHtml += `<button onclick="excluirLivro(${livro.id})" style="background:red; margin-left:8px;">🗑️</button>`;
+            }
+        }
+
+        container.innerHTML += `
+            <div class="card-livro">
+                <img src="${livro.capa}" width="100" onerror="this.src='https://via.placeholder.com/100x150'">
+                <h3>${livro.titulo}</h3>
+                <p>${livro.autor} | ${livro.generol}</p>
+                <div>${acaoHtml}</div>
+            </div>
+        `;
+    });
+}
+
+// --- 4. AÇÕES DE EMPRÉSTIMO ---
+function pegarLivro(id) {
+    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
+    fetch(`${API_URL}/emprestar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ livro_id: id, usuario_id: sessao.id })
+    }).then(() => listarLivros());
+}
+
+function devolverLivro(id) {
+    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
+    fetch(`${API_URL}/devolver`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ livro_id: id, usuario_id: sessao.id })
+    }).then(() => listarLivros());
+}
+
+function excluirLivro(id) {
+    if (!confirm("Excluir este livro?")) return;
+    fetch(`${API_URL}/excluir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ livro_id: id })
+    }).then(() => listarLivros());
+}
+
+// --- 5. INICIALIZAÇÃO ---
 window.onload = () => {
     atualizarDashboard();
     listarLivros();
-
-    const inputPesquisa = document.getElementById('search-input');
-    if (inputPesquisa) inputPesquisa.addEventListener('keyup', pesquisarLivros);
-
-    const botaoLupa = document.getElementById('search-button');
-    if (botaoLupa) botaoLupa.addEventListener('click', pesquisarLivros);
 };
