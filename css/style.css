@@ -13,12 +13,11 @@ body {
     background-color: black;
     margin: 0;
     font-family: "Varela Round", sans-serif;
-    padding: 0;
     color: white;
     overflow-x: hidden;
 }
 
-/* 2. MENU LATERAL E ÍCONES (CORREÇÃO DOS GIGANTES) */
+/* 2. MENU LATERAL FIXO (BARRA DE ÍCONES) */
 nav, .menu-lateral {
     display: flex;
     flex-direction: column;
@@ -27,67 +26,88 @@ nav, .menu-lateral {
     left: 0;
     top: 0;
     height: 100vh;
+    width: 80px; /* Largura da barra lateral */
     padding: 20px 10px;
-    background-color: #000;
+    background-color: #111; /* Um pouco mais claro que o fundo para dar profundidade */
     z-index: 1000;
-    border-right: 1px solid #222;
-    width: 70px; /* Largura fixa para a barra lateral */
+    border-right: 1px solid #333;
 }
 
-/* Força o tamanho correto dos ícones de navegação */
-.ic, 
-nav img, 
-.menu-lateral img, 
-#dashboard-header img {
+/* ÍCONES DA BARRA LATERAL */
+.ic, nav img, .menu-lateral img {
     width: 35px !important;
     height: 35px !important;
     min-width: 35px !important;
-    max-width: 35px !important;
     object-fit: contain !important;
-    display: block;
-    margin-bottom: 25px;
-    transition: transform 0.2s, filter 0.2s;
+    margin-bottom: 30px;
+    transition: transform 0.2s;
     cursor: pointer;
 }
 
-.ic:hover, nav img:hover {
-    transform: scale(1.1);
+.ic:hover {
+    transform: scale(1.2);
     filter: drop-shadow(0 0 8px #0091ff);
 }
 
-/* 3. ESTRUTURA DAS SEÇÕES E BANNER */
-section {
-    padding: 40px 0;
-    margin-left: 70px; /* Dá espaço para a barra lateral não cobrir o conteúdo */
+/* 3. CONTEÚDO PRINCIPAL (Tudo que não é o menu lateral) */
+main, section, .conteudo-principal {
+    margin-left: 80px; /* IMPORTANTE: Empurra tudo para a direita para não bater nos ícones */
+    width: calc(100% - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza tudo horizontalmente */
 }
 
+/* 4. BANNER E CABEÇALHO */
 .titulo-container {
     width: 100%;
-    padding: 20px;
+    padding: 40px 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .titulo {
-    max-width: 1000px; 
-    width: 90%;      
+    max-width: 800px; 
+    width: 100%;      
     height: auto;    
-    display: block;
-    margin: 0 auto;
+    margin-bottom: 20px;
 }
 
-/* 4. CONTAINER DA LISTA (GRID) */
+#dashboard-header {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+/* 5. BARRA DE PESQUISA */
+.pesquisa-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 0 20px;
+    margin-bottom: 40px;
+}
+
+#pesquisar-input {
+    width: 100%;
+    padding: 15px 25px;
+    border-radius: 30px;
+    border: 1px solid #333;
+    background: #111;
+    color: white;
+    font-size: 1rem;
+}
+
+/* 6. GRID DE LIVROS */
 #lista-livros {
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
     justify-content: center;
     padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
+    width: 100%;
 }
 
-/* 5. ESTILO DO CARD DO LIVRO */
+/* 7. CARD DO LIVRO */
 .card-livro { 
     display: flex; 
     flex-direction: column; 
@@ -96,73 +116,49 @@ section {
     border-radius: 15px;
     overflow: hidden;
     border: 1px solid #222;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .card-livro:hover {
     transform: translateY(-10px);
     border-color: #0091ff;
-    box-shadow: 0 15px 40px rgba(0, 145, 255, 0.2);
 }
 
-/* 6. CAPA DO LIVRO NO CARD */
 .capa-container {
     width: 100%;
-    height: 350px;
-    background-color: #000;
+    height: 360px;
     overflow: hidden;
 }
 
 .capa-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ajusta a imagem sem distorcer */
-    transition: transform 0.5s ease;
+    object-fit: cover;
 }
 
-.card-livro:hover .capa-container img {
-    transform: scale(1.05);
-}
-
-/* 7. DETALHES, TEXTOS E TAGS */
 .card-detalhes {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    gap: 8px;
 }
 
 .genero-tag {
     background: rgba(0, 145, 255, 0.1);
-    padding: 5px 12px;
-    border-radius: 50px;
-    font-size: 0.7rem;
-    align-self: flex-start;
     color: #0091ff;
-    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
     font-weight: bold;
-    margin-bottom: 10px;
+    align-self: flex-start;
 }
 
 .card-detalhes h3 {
     font-size: 1.1rem;
-    color: #fff;
-    margin-bottom: 5px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    min-height: 2.8em; 
+    color: white;
 }
 
-.card-detalhes p {
-    color: #888;
-    font-size: 0.85rem;
-    margin-bottom: 15px;
-}
-
-/* 8. BOTÕES E STATUS */
+/* 8. BOTÕES */
 .btn-pegar { 
     background: #0091ff; 
     color: white; 
@@ -171,59 +167,10 @@ section {
     cursor: pointer; 
     border-radius: 8px;
     font-weight: bold;
-    margin-top: auto; /* Alinha o botão na base */
-    transition: background 0.2s;
     width: 100%;
+    margin-top: 10px;
 }
 
 .btn-pegar:hover {
     background: #0070c7;
-}
-
-.indisponivel { 
-    color: #ff1869;
-    font-weight: bold; 
-    font-size: 0.9em;
-    text-align: center;
-    margin-top: auto;
-    padding: 12px;
-}
-
-/* 9. DASHBOARD E LOGIN */
-#dashboard-header {
-    margin-left: 70px;
-    padding: 20px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 15px;
-}
-
-#dashboard-header span {
-    font-size: 0.9rem;
-    color: #bbb;
-}
-
-/* 10. RESPONSIVIDADE CELULAR */
-@media (max-width: 768px) {
-    nav, .menu-lateral {
-        width: 100%;
-        height: 60px;
-        flex-direction: row;
-        bottom: 0;
-        top: auto;
-        border-right: none;
-        border-top: 1px solid #222;
-        justify-content: space-around;
-        padding: 5px;
-    }
-
-    section, #dashboard-header {
-        margin-left: 0;
-        padding-bottom: 80px;
-    }
-
-    .ic, nav img {
-        margin-bottom: 0;
-    }
 }
