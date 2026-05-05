@@ -151,3 +151,29 @@ section {
     margin-top: auto;
     padding: 12px;
 }
+/* 1. Limita o tamanho de qualquer ícone que use a classe .ic ou que esteja na navegação */
+.ic, .nav-icon, nav img {
+    width: 35px !important;  /* Tamanho ideal para ícones de menu */
+    height: 35px !important;
+    object-fit: contain;
+    transition: transform 0.2s;
+}
+
+/* 2. Se eles estiverem dentro de uma barra lateral ou topo, vamos organizar */
+nav, .menu-lateral {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding: 10px;
+}
+
+/* 3. Efeitozinho legal ao passar o mouse */
+.ic:hover, nav img:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+}
+
+/* 4. Garante que imagens gerais não herdem tamanhos gigantes por erro */
+img {
+    max-width: 100%;
+}
