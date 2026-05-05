@@ -18,9 +18,47 @@ body {
     overflow-x: hidden;
 }
 
-/* 2. ESTRUTURA DAS SEÇÕES */
+/* 2. MENU LATERAL E ÍCONES (CORREÇÃO DOS GIGANTES) */
+nav, .menu-lateral {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    padding: 20px 10px;
+    background-color: #000;
+    z-index: 1000;
+    border-right: 1px solid #222;
+    width: 70px; /* Largura fixa para a barra lateral */
+}
+
+/* Força o tamanho correto dos ícones de navegação */
+.ic, 
+nav img, 
+.menu-lateral img, 
+#dashboard-header img {
+    width: 35px !important;
+    height: 35px !important;
+    min-width: 35px !important;
+    max-width: 35px !important;
+    object-fit: contain !important;
+    display: block;
+    margin-bottom: 25px;
+    transition: transform 0.2s, filter 0.2s;
+    cursor: pointer;
+}
+
+.ic:hover, nav img:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px #0091ff);
+}
+
+/* 3. ESTRUTURA DAS SEÇÕES E BANNER */
 section {
-    padding: 40px 0; /* Ajustado para aproximar os cards do banner */
+    padding: 40px 0;
+    margin-left: 70px; /* Dá espaço para a barra lateral não cobrir o conteúdo */
 }
 
 .titulo-container {
@@ -38,7 +76,7 @@ section {
     margin: 0 auto;
 }
 
-/* 4. O CONTAINER DA LISTA */
+/* 4. CONTAINER DA LISTA (GRID) */
 #lista-livros {
     display: flex;
     flex-wrap: wrap;
@@ -49,12 +87,12 @@ section {
     margin: 0 auto;
 }
 
-/* 5. ESTILO DO CARD (ORGANIZADO) */
+/* 5. ESTILO DO CARD DO LIVRO */
 .card-livro { 
     display: flex; 
     flex-direction: column; 
     background: #111;
-    width: 260px; /* Aumentei um pouco para melhor leitura */
+    width: 260px;
     border-radius: 15px;
     overflow: hidden;
     border: 1px solid #222;
@@ -68,10 +106,10 @@ section {
     box-shadow: 0 15px 40px rgba(0, 145, 255, 0.2);
 }
 
-/* 6. CAPA */
+/* 6. CAPA DO LIVRO NO CARD */
 .capa-container {
     width: 100%;
-    height: 350px; /* Altura fixa para manter o padrão */
+    height: 350px;
     background-color: #000;
     overflow: hidden;
 }
@@ -79,20 +117,20 @@ section {
 .capa-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Corta a imagem para preencher sem esticar */
+    object-fit: cover; /* Ajusta a imagem sem distorcer */
     transition: transform 0.5s ease;
 }
 
 .card-livro:hover .capa-container img {
-    transform: scale(1.05); /* Efeito de zoom suave ao passar o mouse */
+    transform: scale(1.05);
 }
 
-/* 7. DETALHES E TEXTOS */
+/* 7. DETALHES, TEXTOS E TAGS */
 .card-detalhes {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Faz o container de texto ocupar o resto do card */
+    flex-grow: 1;
 }
 
 .genero-tag {
@@ -111,7 +149,6 @@ section {
     font-size: 1.1rem;
     color: #fff;
     margin-bottom: 5px;
-    /* Limita a 2 linhas e coloca "..." se for muito grande */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -125,7 +162,7 @@ section {
     margin-bottom: 15px;
 }
 
-/* 8. BOTÕES */
+/* 8. BOTÕES E STATUS */
 .btn-pegar { 
     background: #0091ff; 
     color: white; 
@@ -134,7 +171,7 @@ section {
     cursor: pointer; 
     border-radius: 8px;
     font-weight: bold;
-    margin-top: auto; /* Empurra o botão sempre para o final do card */
+    margin-top: auto; /* Alinha o botão na base */
     transition: background 0.2s;
     width: 100%;
 }
@@ -151,29 +188,42 @@ section {
     margin-top: auto;
     padding: 12px;
 }
-/* 1. Limita o tamanho de qualquer ícone que use a classe .ic ou que esteja na navegação */
-.ic, .nav-icon, nav img {
-    width: 35px !important;  /* Tamanho ideal para ícones de menu */
-    height: 35px !important;
-    object-fit: contain;
-    transition: transform 0.2s;
-}
 
-/* 2. Se eles estiverem dentro de uma barra lateral ou topo, vamos organizar */
-nav, .menu-lateral {
+/* 9. DASHBOARD E LOGIN */
+#dashboard-header {
+    margin-left: 70px;
+    padding: 20px;
     display: flex;
-    gap: 15px;
+    justify-content: flex-end;
     align-items: center;
-    padding: 10px;
+    gap: 15px;
 }
 
-/* 3. Efeitozinho legal ao passar o mouse */
-.ic:hover, nav img:hover {
-    transform: scale(1.1);
-    filter: brightness(1.2);
+#dashboard-header span {
+    font-size: 0.9rem;
+    color: #bbb;
 }
 
-/* 4. Garante que imagens gerais não herdem tamanhos gigantes por erro */
-img {
-    max-width: 100%;
+/* 10. RESPONSIVIDADE CELULAR */
+@media (max-width: 768px) {
+    nav, .menu-lateral {
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        bottom: 0;
+        top: auto;
+        border-right: none;
+        border-top: 1px solid #222;
+        justify-content: space-around;
+        padding: 5px;
+    }
+
+    section, #dashboard-header {
+        margin-left: 0;
+        padding-bottom: 80px;
+    }
+
+    .ic, nav img {
+        margin-bottom: 0;
+    }
 }
