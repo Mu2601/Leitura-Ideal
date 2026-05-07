@@ -1,4 +1,4 @@
-/* 1. CONFIGURAÇÕES GLOBAIS E FONTES */
+/* 1. CONFIGURAÇÕES GLOBAIS */
 @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
 
 * {
@@ -6,85 +6,81 @@
     padding: 0;
     box-sizing: border-box;
     text-decoration: none;
+    list-style: none; /* Remove as bolinhas brancas dos ícones */
     outline: none;
 }
 
 body {
     background-color: black;
-    margin: 0;
     font-family: "Varela Round", sans-serif;
     color: white;
     overflow-x: hidden;
+    display: flex; /* Permite alinhar nav e main lado a lado */
 }
 
-/* 2. MENU LATERAL FIXO (BARRA DE ÍCONES) */
-nav, .menu-lateral {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* 2. MENU LATERAL (NAV) */
+nav {
+    width: 80px;
+    height: 100vh;
+    background-color: #111;
+    border-right: 1px solid #333;
     position: fixed;
     left: 0;
     top: 0;
-    height: 100vh;
-    width: 80px; /* Largura da barra lateral */
-    padding: 20px 10px;
-    background-color: #111; /* Um pouco mais claro que o fundo para dar profundidade */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
     z-index: 1000;
-    border-right: 1px solid #333;
 }
 
-/* ÍCONES DA BARRA LATERAL */
-.ic, nav img, .menu-lateral img {
+nav img, .ic {
     width: 35px !important;
     height: 35px !important;
-    min-width: 35px !important;
-    object-fit: contain !important;
-    margin-bottom: 30px;
-    transition: transform 0.2s;
+    margin-bottom: 25px;
+    transition: 0.3s;
     cursor: pointer;
 }
 
-.ic:hover {
+nav img:hover {
     transform: scale(1.2);
     filter: drop-shadow(0 0 8px #0091ff);
 }
 
-/* 3. CONTEÚDO PRINCIPAL (Tudo que não é o menu lateral) */
-main, section, .conteudo-principal {
-    margin-left: 80px; /* IMPORTANTE: Empurra tudo para a direita para não bater nos ícones */
-    width: calc(100% - 80px);
+/* 3. CONTEÚDO PRINCIPAL (CENTRALIZADO) */
+main {
+    margin-left: 80px; /* Abre espaço para a nav */
+    width: calc(100% - 80px); /* Ocupa o resto da tela */
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centraliza tudo horizontalmente */
+    align-items: center; /* CENTRALIZA TUDO HORIZONTALMENTE */
+    padding: 40px 20px;
 }
 
-/* 4. BANNER E CABEÇALHO */
-.titulo-container {
+/* 4. ELEMENTOS DO TOPO */
+.header-principal {
     width: 100%;
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    max-width: 800px;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 .titulo {
-    max-width: 800px; 
-    width: 100%;      
-    height: auto;    
-    margin-bottom: 20px;
+    width: 100%;
+    height: auto;
 }
 
 #dashboard-header {
-    margin-bottom: 20px;
-    font-size: 0.9rem;
+    margin: 10px 0 30px 0;
+    font-size: 1rem;
+    color: #0091ff;
 }
 
 /* 5. BARRA DE PESQUISA */
 .pesquisa-container {
     width: 100%;
-    max-width: 600px;
-    padding: 0 20px;
-    margin-bottom: 40px;
+    max-width: 600px; /* Não deixa a barra esticar demais */
+    margin-bottom: 50px;
 }
 
 #pesquisar-input {
@@ -95,6 +91,12 @@ main, section, .conteudo-principal {
     background: #111;
     color: white;
     font-size: 1rem;
+    transition: 0.3s;
+}
+
+#pesquisar-input:focus {
+    border-color: #0091ff;
+    box-shadow: 0 0 10px rgba(0, 145, 255, 0.2);
 }
 
 /* 6. GRID DE LIVROS */
@@ -102,21 +104,21 @@ main, section, .conteudo-principal {
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
-    justify-content: center;
-    padding: 20px;
+    justify-content: center; /* Centraliza os cards no grid */
     width: 100%;
+    max-width: 1200px;
 }
 
 /* 7. CARD DO LIVRO */
-.card-livro { 
-    display: flex; 
-    flex-direction: column; 
+.card-livro {
     background: #111;
     width: 260px;
     border-radius: 15px;
     overflow: hidden;
     border: 1px solid #222;
-    transition: transform 0.3s ease, border-color 0.3s ease;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-livro:hover {
@@ -127,7 +129,6 @@ main, section, .conteudo-principal {
 .capa-container {
     width: 100%;
     height: 360px;
-    overflow: hidden;
 }
 
 .capa-container img {
@@ -140,7 +141,8 @@ main, section, .conteudo-principal {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    flex-grow: 1;
 }
 
 .genero-tag {
@@ -158,17 +160,16 @@ main, section, .conteudo-principal {
     color: white;
 }
 
-/* 8. BOTÕES */
-.btn-pegar { 
-    background: #0091ff; 
-    color: white; 
-    border: none; 
-    padding: 12px; 
-    cursor: pointer; 
+.btn-pegar {
+    background: #0091ff;
+    color: white;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
     border-radius: 8px;
     font-weight: bold;
-    width: 100%;
-    margin-top: 10px;
+    margin-top: auto; /* Joga o botão para o fim do card */
+    transition: 0.3s;
 }
 
 .btn-pegar:hover {
