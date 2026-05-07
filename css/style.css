@@ -92,3 +92,26 @@ main {
     justify-content: center; /* Centraliza os cards no espaço que sobrar */
     width: 100%;
 }
+/* Estilo para os botões dentro dos cards que o JS gera */
+.btn-pegar {
+    background: #0091ff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    width: 100%;
+}
+
+.btn-pegar:hover {
+    background: #0070c7;
+}
+
+/* Efeito de hover nos cards para dar vida ao site */
+.card-livro:hover {
+    transform: translateY(-8px);
+    border-color: #0091ff !important;
+    box-shadow: 0 10px 20px rgba(0, 145, 255, 0.1);
+}
