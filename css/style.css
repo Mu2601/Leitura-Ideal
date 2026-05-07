@@ -1,30 +1,28 @@
 /* 1. CONFIGURAÇÕES GLOBAIS */
 @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
 
+/* 1. RESET E BASE */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    text-decoration: none;
-    list-style: none; /* Remove as bolinhas brancas dos ícones */
-    outline: none;
+    list-style: none;
 }
 
 body {
     background-color: black;
     font-family: "Varela Round", sans-serif;
     color: white;
-    overflow-x: hidden;
-    display: flex; /* Permite alinhar nav e main lado a lado */
+    display: flex; /* Coloca Nav e Main lado a lado */
 }
 
-/* 2. MENU LATERAL (NAV) */
+/* 2. BARRA LATERAL FIXA */
 nav {
     width: 80px;
     height: 100vh;
     background-color: #111;
     border-right: 1px solid #333;
-    position: fixed;
+    position: fixed; /* Fixa na tela */
     left: 0;
     top: 0;
     display: flex;
@@ -34,35 +32,28 @@ nav {
     z-index: 1000;
 }
 
-nav img, .ic {
+nav img {
     width: 35px !important;
-    height: 35px !important;
     margin-bottom: 25px;
-    transition: 0.3s;
     cursor: pointer;
 }
 
-nav img:hover {
-    transform: scale(1.2);
-    filter: drop-shadow(0 0 8px #0091ff);
-}
-
-/* 3. CONTEÚDO PRINCIPAL (CENTRALIZADO) */
+/* 3. CONTEÚDO PRINCIPAL (Tudo que não é a barra lateral) */
 main {
-    margin-left: 80px; /* Abre espaço para a nav */
-    width: calc(100% - 80px); /* Ocupa o resto da tela */
+    margin-left: 80px; /* Abre espaço exato para a Nav */
+    width: calc(100% - 80px); /* Ocupa o restante da tela */
     display: flex;
     flex-direction: column;
-    align-items: center; /* CENTRALIZA TUDO HORIZONTALMENTE */
+    align-items: center; /* CENTRALIZA TUDO NO EIXO X */
     padding: 40px 20px;
 }
 
-/* 4. ELEMENTOS DO TOPO */
+/* 4. BANNER (HEADER) CENTRALIZADO */
 .header-principal {
     width: 100%;
-    max-width: 800px;
-    margin-bottom: 30px;
+    max-width: 800px; /* Tamanho do banner */
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .titulo {
@@ -70,17 +61,17 @@ main {
     height: auto;
 }
 
+/* 5. DASHBOARD (Olá Miroki) */
 #dashboard-header {
-    margin: 10px 0 30px 0;
-    font-size: 1rem;
-    color: #0091ff;
+    margin-bottom: 30px;
+    text-align: center;
 }
 
-/* 5. BARRA DE PESQUISA */
+/* 6. BARRA DE PESQUISA */
 .pesquisa-container {
     width: 100%;
-    max-width: 600px; /* Não deixa a barra esticar demais */
-    margin-bottom: 50px;
+    max-width: 600px;
+    margin-bottom: 40px;
 }
 
 #pesquisar-input {
@@ -91,87 +82,13 @@ main {
     background: #111;
     color: white;
     font-size: 1rem;
-    transition: 0.3s;
 }
 
-#pesquisar-input:focus {
-    border-color: #0091ff;
-    box-shadow: 0 0 10px rgba(0, 145, 255, 0.2);
-}
-
-/* 6. GRID DE LIVROS */
+/* 7. GRID DE LIVROS CENTRALIZADO */
 #lista-livros {
     display: flex;
     flex-wrap: wrap;
     gap: 30px;
-    justify-content: center; /* Centraliza os cards no grid */
+    justify-content: center; /* Centraliza os cards no espaço que sobrar */
     width: 100%;
-    max-width: 1200px;
-}
-
-/* 7. CARD DO LIVRO */
-.card-livro {
-    background: #111;
-    width: 260px;
-    border-radius: 15px;
-    overflow: hidden;
-    border: 1px solid #222;
-    transition: 0.3s;
-    display: flex;
-    flex-direction: column;
-}
-
-.card-livro:hover {
-    transform: translateY(-10px);
-    border-color: #0091ff;
-}
-
-.capa-container {
-    width: 100%;
-    height: 360px;
-}
-
-.capa-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.card-detalhes {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    flex-grow: 1;
-}
-
-.genero-tag {
-    background: rgba(0, 145, 255, 0.1);
-    color: #0091ff;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    align-self: flex-start;
-}
-
-.card-detalhes h3 {
-    font-size: 1.1rem;
-    color: white;
-}
-
-.btn-pegar {
-    background: #0091ff;
-    color: white;
-    border: none;
-    padding: 12px;
-    cursor: pointer;
-    border-radius: 8px;
-    font-weight: bold;
-    margin-top: auto; /* Joga o botão para o fim do card */
-    transition: 0.3s;
-}
-
-.btn-pegar:hover {
-    background: #0070c7;
 }
