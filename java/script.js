@@ -213,18 +213,27 @@ function devolverLivro(id) {
 
 function carregarRecomendacoes() {
     const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
-    if (!sessao) return;
+    if (!sessao) return; // Se não estiver logado, não mostra nada
 
     fetch(`${API_URL}/recomendar/${sessao.id}`)
         .then(res => res.json())
         .then(livros => {
-            const divRec = document.getElementById('secao-recomendacoes');
-            if (!divRec || livros.length === 0) return;
-
-            divRec.innerHTML = `<h3>Sugestões para você baseadas em seu perfil:</h3>`;
-            livros.forEach(l => {
-                divRec.innerHTML += `<img src="${l.capa}" title="${l.titulo}" class="mini-capa">`;
-            });
+            const container = document.getElementById('secao-recomendacoes');
+            const lista = document.getElementById('lista-recomendados');
+            
+            if (livros.length > 0) {
+                container.style.display = 'block'; // Mostra a seção
+                lista.innerHTML = ''; // Limpa antes de carregar
+                
+                livros.forEach(livro => {
+                    lista.innerHTML += `
+                        <div style="min-width: 120px; text-align: center;">
+                            <img src="${livro.capa}" style="width: 100px; height: 140px; border-radius: 5px; object-fit: cover;">
+                            <p style="font-size: 12px; color: white; margin-top: 5px;">${livro.titulo}</p>
+                        </div>
+                    `;
+                });
+            }
         });
 }
 function excluirLivro(id) {
