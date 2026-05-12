@@ -55,5 +55,21 @@
         <br>
         <a href="index.html" style="color: #aaa; text-decoration: none;">← Voltar para a Biblioteca</a>
     </div>
+<script>
+    // Esta função roda assim que o navegador termina de carregar o HTML
+    document.addEventListener('DOMContentLoaded', () => {
+        // Busca os dados do usuário que logou
+        const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+        // Validação: 
+        // 1. Se não houver sessão (null)
+        // 2. Ou se o tipo de usuário não for 'admin'
+        if (!sessao || sessao.tipo !== 'admin') {
+            alert("⚠️ Acesso restrito! Apenas o Bibliotecário pode adicionar livros.");
+            // Redireciona imediatamente para a página principal
+            window.location.href = "index.html";
+        }
+    });
+</script>
 </body>
 </html>
