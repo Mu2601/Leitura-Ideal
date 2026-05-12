@@ -88,7 +88,7 @@ function listarLivros() {
     .then(res => res.json())
     .then(dadosBrutos => {
         todosOsLivros = dadosBrutos.filter(l => l && l.titulo); 
-        renderizarCards(todosOsLivros);
+        renderizarLivros(todosOsLivros);
     })
     .catch(err => console.error("Erro ao listar:", err));
 }
@@ -100,7 +100,7 @@ function filtrarLivros() {
         livro.titulo.toLowerCase().includes(termo) || 
         livro.autor.toLowerCase().includes(termo)
     );
-    renderizarCards(filtrados);
+    renderizarLivros(filtrados);
 }
 
 // ... (mantenha o topo do arquivo com as variáveis e funções de login)
