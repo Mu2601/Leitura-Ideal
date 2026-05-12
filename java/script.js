@@ -210,6 +210,23 @@ function devolverLivro(id) {
         }
     });
 }
+
+function carregarRecomendacoes() {
+    const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
+    if (!sessao) return;
+
+    fetch(`${API_URL}/recomendar/${sessao.id}`)
+        .then(res => res.json())
+        .then(livros => {
+            const divRec = document.getElementById('secao-recomendacoes');
+            if (!divRec || livros.length === 0) return;
+
+            divRec.innerHTML = `<h3>Sugestões para você baseadas em seu perfil:</h3>`;
+            livros.forEach(l => {
+                divRec.innerHTML += `<img src="${l.capa}" title="${l.titulo}" class="mini-capa">`;
+            });
+        });
+}
 function excluirLivro(id) {
     if (!confirm("Excluir este livro?")) return;
     fetch(`${API_URL}/excluir`, {
