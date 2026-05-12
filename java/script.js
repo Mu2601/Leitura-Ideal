@@ -84,15 +84,26 @@ function cadastrarLivro() {
 
 // --- 3. LISTAGEM E BUSCA ---
 function listarLivros() {
+    console.log("Tentando buscar livros em:", `${API_URL}/listar`);
+    
     fetch(`${API_URL}/listar`)
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error("Erro na rede: " + res.status);
+        return res.json();
+    })
     .then(dadosBrutos => {
+        console.log("Dados recebidos da API:", dadosBrutos);
+        // Filtra apenas itens válidos para evitar erros na planilha
         todosOsLivros = dadosBrutos.filter(l => l && l.titulo); 
         renderizarLivros(todosOsLivros);
     })
-    .catch(err => console.error("Erro ao listar:", err));
+    .catch(err => {
+        console.error("Erro detalhado ao listar:", err);
+        // Se der erro, avisa na tabela para você não ficar no escuro
+        const tbody = document.getElementById('lista-livros-tbody');
+        if(tbody) tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Erro ao carregar livros. Verifique o console (F12).</td></tr>`;
+    });
 }
-
 // FUNÇÃO DE BUSCA (FILTRO)
 function filtrarLivros() {
     const termo = document.getElementById('pesquisar-input').value.toLowerCase();
