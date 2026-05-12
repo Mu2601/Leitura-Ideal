@@ -188,36 +188,26 @@ function pegarLivro(id) {
 function devolverLivro(id) {
     const sessao = JSON.parse(localStorage.getItem('usuarioLogado'));
     
-    if (!sessao) {
-        alert("Sessão expirada. Faça login novamente.");
-        return;
-    }
-
-    // Criamos o objeto garantindo que o ID seja número e o Usuário seja string
-    const dados = {
-        livro_id: parseInt(id),
-        usuario_id: String(sessao.id)
-    };
-
-    console.log("Tentando devolver:", dados); // Para você ver no F12 se os dados estão certos
+    // Garantimos que o ID do usuário seja uma STRING limpa
+    const usuarioIdEnvio = String(sessao.id).trim();
 
     fetch(`${API_URL}/devolver`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados)
+        body: JSON.stringify({ 
+            livro_id: parseInt(id), 
+            usuario_id: usuarioIdEnvio 
+        })
     })
     .then(res => res.json())
-    .then(retorno => {
-        if (retorno.success) {
-            alert("✅ Livro devolvido com sucesso!");
-            listarLivros(); // Recarrega a planilha
+    .then(dados => {
+        if (dados.success) {
+            alert("✅ Livro devolvido!");
+            listarLivros();
         } else {
-            alert("❌ Erro: " + retorno.message);
+            // Esse alerta vai nos mostrar o que o Python está rejeitando
+            alert("❌ Erro: " + dados.message);
         }
-    })
-    .catch(err => {
-        console.error("Erro na chamada da API:", err);
-        alert("Erro de conexão com o servidor.");
     });
 }
 function excluirLivro(id) {
